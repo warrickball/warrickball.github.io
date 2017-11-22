@@ -4,7 +4,7 @@ SRCDIR = src
 # Lists of page bodies and auxiliary files.
 PAGES = index.html publications.html
 # DEPS = style.css
-DEPS = 
+DEPS = $(SRCDIR)/header.html $(SRCDIR)/footer.html
 
 all: $(DEPS) $(PAGES)
 
@@ -16,8 +16,8 @@ $(PAGES): %.html: $(SRCDIR)/%.html $(DEPS)
 	cat $(SRCDIR)/header.html $(SRCDIR)/$@ $(SRCDIR)/footer.html > $@
 
 # For auxiliary files, copy from the source directory.
-$(DEPS): %: $(SRCDIR)/%
-	cp $^ $@  # Copy
+# $(DEPS): %: $(SRCDIR)/%
+# 	cp $^ $@  # Copy
 
 # Safety catch.
 .PHONY: clean
