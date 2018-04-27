@@ -24,4 +24,4 @@ $(PAGES): %.html: $(SRCDIR)/%.html $(DEPS)
 
 # Delete all files made by this Makefile.
 clean:
-	rm $(PAGES) $(DEPS)
+	rm $(PAGES)
