@@ -10,6 +10,7 @@ all: $(DEPS) $(PAGES)
 
 $(SRCDIR)/publications.html: $(SRCDIR)/publications.bib $(SRCDIR)/warrickcv.bst $(SRCDIR)/bib2table.sh
 	cd $(SRCDIR); bash bib2table.sh publications.bib > publications.html; cd ..
+	sed -i 's/<table>/<table cellspacing="10">/' src/publications.html
 
 # For pages, delete the old page, then concatenate the header, body and footer.
 $(PAGES): %.html: $(SRCDIR)/%.html $(DEPS)
