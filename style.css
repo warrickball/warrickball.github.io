@@ -1,8 +1,13 @@
 body {
     background-color: #aaa;
+    color: #333;
     margin: 0;
     padding: 0;
     font-family: FreeSans, sans-serif;
+    text-align: left;
+}
+
+h1 {
     text-align: center;
 }
 
@@ -13,7 +18,6 @@ p {
 table {
     margin-left: auto;
     margin-right: auto;
-    text-align: left;
 }
 
 .container {
@@ -23,13 +27,13 @@ table {
 
 .header {
     background-color: white;
-    color: black;
+    color: #333;
     padding: 1em 1.25em;
 }
 
 .content {
     background-color: white;
-    color: black;
+    color: #333;
     padding: 1em 1.25em;
 }
 
@@ -37,6 +41,7 @@ ul#inline {
     margin: 0;
     padding: 0;
     list-style: none;
+    text-align: center;
 }
 
 ul#inline li {

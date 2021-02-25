@@ -2,18 +2,26 @@
 SRCDIR = src
 
 # Lists of page bodies and auxiliary files.
-PAGES = index.html publications.html
+BASIC = index.html publications.html
+PANDOC = faster-code.html
 # DEPS = style.css
 DEPS = $(SRCDIR)/header.html $(SRCDIR)/footer.html
 
-all: $(DEPS) $(PAGES)
+all: $(DEPS) $(BASIC) $(PANDOC)
 
 $(SRCDIR)/publications.html: $(SRCDIR)/publications.bib $(SRCDIR)/warrickcv.bst $(SRCDIR)/bib2table.sh
 	cd $(SRCDIR); bash bib2table.sh publications.bib > publications.html; cd ..
 	sed -i 's/<table>/<table cellspacing="10">/' $(SRCDIR)/publications.html
 
-# For pages, delete the old page, then concatenate the header, body and footer.
-$(PAGES): %.html: $(SRCDIR)/%.html $(DEPS)
+# For pages generated from Markdown using Pandoc, concatenate the header,
+# body converted by Pandoc and footer.
+$(PANDOC): %.html: $(SRCDIR)/%.md $(DEPS)
+	cat $(SRCDIR)/header.html > $@
+	pandoc $< -f markdown -t html >> $@
+	cat $(SRCDIR)/footer.html >> $@
+
+# For basic pages, concatenate the header, body and footer.
+$(BASIC): %.html: $(SRCDIR)/%.html $(DEPS)
 	cat $(SRCDIR)/header.html $(SRCDIR)/$@ $(SRCDIR)/footer.html > $@
 
 # For auxiliary files, copy from the source directory.
