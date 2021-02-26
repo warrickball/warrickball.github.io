@@ -22,7 +22,7 @@
 	</ul>
       </div>
       <div class="content">
-<h1 id="faster-code">Faster code</h1>
+<h1 id="writing-faster-code">Writing faster code</h1>
 <p>These notes cover some basics about the two principal aspects of speeding up your code:</p>
 <ol type="1">
 <li>basic tools for identifying bottlenecks and</li>
@@ -50,11 +50,11 @@ hello</code></pre>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>    <span class="cf">return</span> <span class="dv">4</span></span></code></pre></div>
 <p>More importantly, you don’t want to break your code by speeding it up. The best way to avoid this is to have unit tests that cover most (ideally all) of the code and run regularly (ideally automatically).</p>
 <h2 id="profiling">Profiling</h2>
-<p>Before you start trying to make your code faster, you need to know what part is slow. Even if you speed things up by a factor of 100 in a part of the code that contributes 1% to the runtime, you’ll still only reduce the overall runtime by 1%.</p>
-<p>But that does <em>not</em> mean you shouldn’t try to find what is dominating the runtime, speed that up and, having done so, profile again to see where the next bottleneck is.</p>
+<p>Before you start trying to make your code faster, you need to know what part is slow. Even if you speed things up by a factor of 100 in a part of the code that contributes 1% to the runtime, you’ll still only reduce the overall runtime by 0.99%.</p>
+<p>But that does <em>not</em> mean you shouldn’t try to find what is dominating the runtime, speed that up and, having done so, profile again to find the next bottleneck.</p>
 <p>Also, remember to try profiling your code on varying amounts of data. You might find different bottlenecks on an array of 10⁴ elements as an array of 10⁸ elements. Generally, try to profile as realistic run as you can afford time.</p>
 <h3 id="simple-tools">Simple tools</h3>
-<p>There are a few simple tools that allows to see how long a given snippet of Python takes to run. IPython provides the magic functions <code>%time</code> and <code>%timeit</code>, which use the <a href="https://docs.python.org/3/library/timeit.html"><code>timeit</code></a> module from the standard library. <code>%time</code> on its own just tells you how long a single line of code takes to run. e.g.</p>
+<p>There are a few simple tools that tell you how long a given snippet of Python takes to run. IPython provides the magic functions <code>%time</code> and <code>%timeit</code>, which use the <a href="https://docs.python.org/3/library/timeit.html"><code>timeit</code></a> module from the standard library. <code>%time</code> on its own just tells you how long a single line of code takes to run. e.g.</p>
 <pre><code>In [1]: %time x = [i**2.2 for i in range(10_000_000) if i%3==1]
 CPU times: user 920 ms, sys: 42.6 ms, total: 962 ms
 Wall time: 957 ms</code></pre>
@@ -67,7 +67,7 @@ Wall time: 957 ms</code></pre>
 
 real    0m1.003s
 user    0m0.000s
-sys 0m0.003s</code></pre>
+sys     0m0.003s</code></pre>
 <p>which is what we expect because <code>sleep &lt;n&gt;</code> simply does nothing for <code>n</code> seconds.</p>
 <h3 id="cprofile">cProfile</h3>
 <p><a href="https://docs.python.org/3/library/profile.html">cProfile</a> is a simple and standard profiler whose main advantage is that it’s part of Python’s standard library. If you have Python, you have cProfile.</p>
@@ -142,7 +142,7 @@ sys 0m0.003s</code></pre>
 <pre><code>$ pyprof2calltree -i script.prof -k</code></pre>
 <p><code>pyprof2calltree</code> is not a standard package but you can download it wherever you get your Python packages.</p>
 <h3 id="valgrind">Valgrind</h3>
-<p>For compiled code in many languages (notably including C, C++ or Fortran), there’s a standard program called <a href="https://valgrind.org/">Valgrind</a>. It’s actually a suite of tools and the one for optimising runtime is <code>callgrind</code>. You should be able to install Valgrind from your system packages. You can then run it on a compiled program called <code>./program</code> with</p>
+<p>For compiled code in many languages (notably including C, C++ or Fortran), there’s a standard profiler called <a href="https://valgrind.org/">Valgrind</a>. It’s actually a suite of tools and the one for profiling runtime is <code>callgrind</code>. You should be able to install Valgrind from your system packages. You can then run it on a compiled program called <code>./program</code> with</p>
 <pre><code>$ valgrind --tool=callgrind ./program</code></pre>
 <p>Your program will then run <em>very very slowly</em> and produce a file called something like <code>callgrind.out.&lt;pid&gt;</code>. The output is produced as the program runs, so if it’s taking too long, you can interrupt it with <code>Ctrl-c</code> and still look at whatever was produced up to that point.</p>
 <p>The output file is in an unintelligible binary format but can also be visualised with KCachegrind by running e.g.</p>
@@ -151,7 +151,7 @@ sys 0m0.003s</code></pre>
 <h2 id="broad-strategies">Broad strategies</h2>
 <p>This is a somewhat random collection of things you can try to speed up a block of code. They are roughly in order of increasing difficulty but it depends on your skills and how the code works.</p>
 <h3 id="avoid-loops">Avoid loops</h3>
-<p>Python for-loops are notoriously slow, though I think this is probably true of many interpreted languages. (It was true of MATLAB the last time I used it.) Because we work with arrays, you might be able to replace a loop two arrays with operations directly on the arrays (we say we <em>vectorise</em> the operation) themselves, perhaps by using some logical indexing or broadcasting. The gains are potentially huge: eliminating a for loop often speeds things up by an order of magnitude or more.</p>
+<p>Python for-loops are notoriously slow, though I think this is probably true of many interpreted languages. (It was true of MATLAB the last time I used it.) Because we work with arrays, you might be able to replace a loop over two arrays with operations directly on the arrays themselves (we say we <em>vectorise</em> the operation), perhaps by using some logical indexing or broadcasting. The gains are potentially huge: eliminating a for loop often speeds things up by an order of magnitude or more.</p>
 <p>Though a bit contrived, this is what we’re talking about:</p>
 <pre><code>In [1]: import numpy as np
 
@@ -208,7 +208,7 @@ sleep 4
 
 real    0m10.006s
 user    0m0.003s
-sys 0m0.004s</code></pre>
+sys     0m0.004s</code></pre>
 <p>That makes sense, because we ran sleep for 1s+2s+3s+4s=10s. To use <code>xargs</code> to run <code>sleep</code> in parallel, we use the <code>-P &lt;N&gt;</code> flag, where now <code>&lt;N&gt;</code> is the number of jobs we’d like to use.</p>
 <pre><code>$ time seq 4 | xargs -t -n 1 -P 4 sleep
 sleep 1 
@@ -218,7 +218,7 @@ sleep 4
 
 real    0m4.003s
 user    0m0.002s
-sys 0m0.004s</code></pre>
+sys     0m0.004s</code></pre>
 <p>Again, this makes sense because my computer runs all 4 <code>sleep</code>s in parallel, so we just have to wait for the last one to finish, which takes 4s.</p>
 <h3 id="link-compiled-code">Link compiled code</h3>
 <p>The final change you can try making to your code is to call compiled code directly from Python. The standard tool to call Fortran is <a href="https://numpy.org/doc/stable/f2py/">F2PY</a>, which is part of NumPy.</p>
@@ -242,7 +242,7 @@ from astropy.timeseries import LombScargle</code></pre>
 
 real    0m0.564s
 user    0m0.776s
-sys 0m0.295s</code></pre>
+sys     0m0.295s</code></pre>
 <p>A bit over half a second. That might not seem like much but if you’re running a script to do half a second of work (besides the imports) on thousands of files, you might spend hours just importing Python modules.</p>
 <p>My standard solution is to write scripts that take lists of filenames as arguments and run the scripts over multiple files (perhaps dozens) on each call, usually using <code>xargs</code>.</p>
 <h3 id="binary-io-is-usually-faster-than-plain-text-io.">Binary I/O is usually faster than plain-text I/O.</h3>

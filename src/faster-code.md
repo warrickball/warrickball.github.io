@@ -1,4 +1,4 @@
-# Faster code
+# Writing faster code
 
 These notes cover some basics about the two principal aspects of
 speeding up your code:
@@ -75,11 +75,11 @@ The best way to avoid this is to have unit tests that cover most
 Before you start trying to make your code faster, you need to know
 what part is slow.  Even if you speed things up by a factor of 100 in
 a part of the code that contributes 1% to the runtime, you'll still
-only reduce the overall runtime by 1%.
+only reduce the overall runtime by 0.99%.
 
 But that does *not* mean you shouldn't try to find what is dominating
-the runtime, speed that up and, having done so, profile again to
-see where the next bottleneck is.
+the runtime, speed that up and, having done so, profile again to find
+the next bottleneck.
 
 Also, remember to try profiling your code on varying amounts of data.
 You might find different bottlenecks on an array of 10⁴ elements as an
@@ -88,7 +88,7 @@ you can afford time.
 
 ### Simple tools
 
-There are a few simple tools that allows to see how long a given
+There are a few simple tools that tell you how long a given
 snippet of Python takes to run.  IPython provides the magic functions
 `%time` and `%timeit`, which use the
 [`timeit`](https://docs.python.org/3/library/timeit.html)
@@ -118,9 +118,9 @@ how long `<command>` takes. e.g.
 ```
 $ time sleep 1
 
-real	0m1.003s
-user	0m0.000s
-sys	0m0.003s
+real    0m1.003s
+user    0m0.000s
+sys     0m0.003s
 ```
 
 which is what we expect because `sleep <n>` simply does nothing for
@@ -247,8 +247,8 @@ wherever you get your Python packages.
 ### Valgrind
 
 For compiled code in many languages (notably including C, C++ or Fortran), there's a standard
-program called [Valgrind](https://valgrind.org/).  It's actually a suite of tools and the one
-for optimising runtime is `callgrind`.  You should be able to install
+profiler called [Valgrind](https://valgrind.org/).  It's actually a suite of tools and the one
+for profiling runtime is `callgrind`.  You should be able to install
 Valgrind from your system packages.  You can then run it on a compiled
 program called `./program` with
 
@@ -282,8 +282,8 @@ but it depends on your skills and how the code works.
 Python for-loops are notoriously slow, though I think this is probably
 true of many interpreted languages.  (It was true of MATLAB the last
 time I used it.)  Because we work with arrays, you might be able to
-replace a loop two arrays with operations directly on the arrays (we
-say we *vectorise* the operation) themselves, perhaps by using some
+replace a loop over two arrays with operations directly on the arrays
+themselves (we say we *vectorise* the operation), perhaps by using some
 logical indexing or broadcasting.  The gains are potentially huge:
 eliminating a for loop often speeds things up by an order of magnitude
 or more.
@@ -386,9 +386,9 @@ sleep 2
 sleep 3 
 sleep 4 
 
-real	0m10.006s
-user	0m0.003s
-sys	0m0.004s
+real    0m10.006s
+user    0m0.003s
+sys     0m0.004s
 ```
 That makes sense, because we ran sleep for 1s+2s+3s+4s=10s.  To use
 `xargs` to run `sleep` in parallel, we use the `-P <N>` flag, where
@@ -401,9 +401,9 @@ sleep 2
 sleep 3 
 sleep 4 
 
-real	0m4.003s
-user	0m0.002s
-sys	0m0.004s
+real    0m4.003s
+user    0m0.002s
+sys     0m0.004s
 ```
 Again, this makes sense because my computer runs all 4 `sleep`s in
 parallel, so we just have to wait for the last one to finish, which
@@ -458,9 +458,9 @@ How long does it take to run?
 ```
 $ time python3 ../faster_code/imports.py 
 
-real	0m0.564s
-user	0m0.776s
-sys	0m0.295s
+real    0m0.564s
+user    0m0.776s
+sys     0m0.295s
 ```
 
 A bit over half a second.  That might not seem like much but if you're
